@@ -3,7 +3,7 @@ package com.dev.phonebook.ui;
 import com.dev.phonebook.entity.BusinessContact;
 import com.dev.phonebook.entity.Contact;
 import com.dev.phonebook.entity.PersonalContact;
-import com.dev.phonebook.service.PhoneBookService;
+import com.dev.phonebook.service.impl.PhoneBookServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +15,11 @@ public class ConsoleUI implements AutoCloseable {
 
     private Scanner scanner = new Scanner(System.in);
 
-    private final PhoneBookService phoneBookService;
+    private final PhoneBookServiceImp phoneBookServiceImp;
 
     @Autowired
-    public ConsoleUI(PhoneBookService phoneBookService) {
-        this.phoneBookService = phoneBookService;
+    public ConsoleUI(PhoneBookServiceImp phoneBookServiceImp) {
+        this.phoneBookServiceImp = phoneBookServiceImp;
     }
 
 
@@ -44,6 +44,15 @@ public class ConsoleUI implements AutoCloseable {
                 case 3:
                     showContactsByName();
                     break;
+                case 4:
+                    showContactsByFax();
+                    break;
+                case 6:
+                    deleteContactById();
+                    break;
+                    case 7:
+                        showAllDeletedContacts();
+                        break;
                 default:
                     System.out.println("Invalid choice");
                     break;
@@ -51,31 +60,78 @@ public class ConsoleUI implements AutoCloseable {
         } while (choice != 0);
     }
 
+    private void showAllDeletedContacts() {
+        List<Contact> getActiveContacts = phoneBookServiceImp.getActiveContacts();
+        if (!getActiveContacts.isEmpty()) {
+            List<Contact> deletedContacts = phoneBookServiceImp.getDeletedContacts();
+            if (!deletedContacts.isEmpty()) {
+                for (Contact contact : deletedContacts) {
+                    System.out.println(contact);
+                }
+            }else {
+                System.out.println("No active contacts found");
+            }
+        }else {
+            System.out.println("No active contacts");
+        }
+    }
+
+
+    private void deleteContactById() {
+        List<Contact> getActiveContacts = phoneBookServiceImp.getActiveContacts();
+        if(!getActiveContacts.isEmpty()) {
+            System.out.println("Please enter your ID: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            phoneBookServiceImp.deleteContact(id);
+            System.out.println("Contact deleted successfully");
+        }else {
+            System.out.println("No active contacts found");
+        }
+    }
+
+    private void showContactsByFax() {
+        List<Contact> getActiveContacts = phoneBookServiceImp.getActiveContacts();
+        if (!getActiveContacts.isEmpty()) {
+            System.out.println("Please enter your fax number: ");
+            String fax = scanner.nextLine();
+            List<Contact> contactsByFax = phoneBookServiceImp.getContactsByFax(fax);
+            if (!contactsByFax.isEmpty()) {
+                for (Contact contact : contactsByFax) {
+                    System.out.println(contact);
+                }
+            } else {
+                System.out.println("No contact found");
+            }
+        } else {
+            System.out.println("No active contacts");
+        }
+    }
+
     private void showContactsByName() {
-      List<Contact> activeContacts = phoneBookService.getActiveContacts();
-      if (!activeContacts.isEmpty()){
-          System.out.println("Enter contact name: ");
-          String name = scanner.nextLine();
-          List<Contact> contacts = phoneBookService.getContactsByName(name);
-          if (!contacts.isEmpty()) {
-              for (Contact contact : contacts) {
-                  System.out.println(contact);
-              }
-          }else {
-              System.out.println("Contact not found");
-          }
-      }else {
-          System.out.println("No active contacts");
-      }
+        List<Contact> activeContacts = phoneBookServiceImp.getActiveContacts();
+        if (!activeContacts.isEmpty()) {
+            System.out.println("Enter contact name: ");
+            String name = scanner.nextLine();
+            List<Contact> contacts = phoneBookServiceImp.getContactsByName(name);
+            if (!contacts.isEmpty()) {
+                for (Contact contact : contacts) {
+                    System.out.println(contact);
+                }
+            } else {
+                System.out.println("Contact not found");
+            }
+        } else {
+            System.out.println("No active contacts");
+        }
     }
 
     private void showAllContacts() {
-        List<Contact> activeContacts = phoneBookService.getActiveContacts();
+        List<Contact> activeContacts = phoneBookServiceImp.getActiveContacts();
         if (!activeContacts.isEmpty()) {
             for (Contact contact : activeContacts) {
                 System.out.println(contact);
             }
-        }else{
+        } else {
             System.out.println("No active contacts");
         }
     }
@@ -97,7 +153,7 @@ public class ConsoleUI implements AutoCloseable {
             String email = scanner.nextLine();
             PersonalContact personalContact = new PersonalContact(name, family, phone);
             personalContact.setEmail(email);
-            phoneBookService.add(personalContact);
+            phoneBookServiceImp.add(personalContact);
         } else if (choice == 2) {
             System.out.println("Please enter your contact name: ");
             String name = scanner.nextLine();
@@ -109,7 +165,7 @@ public class ConsoleUI implements AutoCloseable {
             String fax = scanner.nextLine();
             BusinessContact businessContact = new BusinessContact(name, family, phone);
             businessContact.setFax(fax);
-            phoneBookService.add(businessContact);
+            phoneBookServiceImp.add(businessContact);
         } else {
             System.out.println("Invalid choice............");
         }
@@ -121,7 +177,7 @@ public class ConsoleUI implements AutoCloseable {
         System.out.println("1. Show all contacts");
         System.out.println("2. show contacts by Id");
         System.out.println("3. show contacts by Name");
-        System.out.println("4. show contacts by Phone Number");
+        System.out.println("4. show contacts by Fax Number");
         System.out.println("5. Update contact by Id");
         System.out.println("6. Delete contact by Id");
         System.out.println("7. Show all deleted contacts");
