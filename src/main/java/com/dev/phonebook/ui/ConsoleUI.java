@@ -41,11 +41,32 @@ public class ConsoleUI implements AutoCloseable {
                 case 2:
                     showAllContacts();
                     break;
+                case 3:
+                    showContactsByName();
+                    break;
                 default:
                     System.out.println("Invalid choice");
                     break;
             }
         } while (choice != 0);
+    }
+
+    private void showContactsByName() {
+      List<Contact> activeContacts = phoneBookService.getActiveContacts();
+      if (!activeContacts.isEmpty()){
+          System.out.println("Enter contact name: ");
+          String name = scanner.nextLine();
+          List<Contact> contacts = phoneBookService.getContactsByName(name);
+          if (!contacts.isEmpty()) {
+              for (Contact contact : contacts) {
+                  System.out.println(contact);
+              }
+          }else {
+              System.out.println("Contact not found");
+          }
+      }else {
+          System.out.println("No active contacts");
+      }
     }
 
     private void showAllContacts() {

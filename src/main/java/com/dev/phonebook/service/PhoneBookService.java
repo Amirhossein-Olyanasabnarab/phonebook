@@ -21,4 +21,11 @@ public class PhoneBookService {
                 .filter(contact -> !contact.getDeleted())
                 .collect(Collectors.toList());
     }
+
+    public List<Contact> getContactsByName(String name) {
+        return contacts.stream()
+                .filter(contact -> !contact.getDeleted())
+                .filter(contact -> contact.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
 }
