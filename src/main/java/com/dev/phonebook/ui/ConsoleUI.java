@@ -1,8 +1,10 @@
 package com.dev.phonebook.ui;
 
+import com.dev.phonebook.config.GreetingConfig;
 import com.dev.phonebook.entity.BusinessContact;
 import com.dev.phonebook.entity.Contact;
 import com.dev.phonebook.entity.PersonalContact;
+import com.dev.phonebook.service.GreetingService;
 import com.dev.phonebook.service.impl.PhoneBookServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,16 +18,17 @@ public class ConsoleUI implements AutoCloseable {
     private Scanner scanner = new Scanner(System.in);
 
     private final PhoneBookServiceImp phoneBookServiceImp;
-
+    private final GreetingService greetingService;
     @Autowired
-    public ConsoleUI(PhoneBookServiceImp phoneBookServiceImp) {
+    public ConsoleUI(PhoneBookServiceImp phoneBookServiceImp, GreetingService greetingService) {
         this.phoneBookServiceImp = phoneBookServiceImp;
+        this.greetingService = greetingService;
     }
 
 
     public void startApp() {
         int choice;
-
+        System.out.println(greetingService.welcomeMessage());
         do {
             printMenu();
             System.out.println("Choose your choice: ");
